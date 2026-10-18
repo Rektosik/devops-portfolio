@@ -1,0 +1,20 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+
+# Secrets
+.env
+*.pem
+id_rsa*
+id_ed25519*
+
+# Dependencies / build
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+dist/
+build/
