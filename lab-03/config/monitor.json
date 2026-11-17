@@ -1,0 +1,19 @@
+{
+  "endpoints": [
+    {
+      "name": "GitHub API",
+      "url": "https://api.github.com",
+      "expected_status": 200
+    },
+    {
+      "name": "HTTPBin Status 200",
+      "url": "https://httpbin.org/status/200",
+      "expected_status": 200
+    },
+    {
+      "name": "HTTPBin Unauthorized Check",
+      "url": "https://httpbin.org/status/401",
+      "expected_status": 401
+    }
+  ]
+}
