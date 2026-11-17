@@ -1,27 +1,20 @@
-
 set -euo pipefail
 
-FORBIDDEN_REGEX="(API_KEY|SECRET_KEY|PASSWORD|DO_NOT_COMMIT)[[:space:]]*="
-
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
-
-if [[ -z "$STAGED_FILES" ]]; then
-    exit 0
-fi
+FORBIDDEN_REGEX="(api_key|secret_key|password|do_not_commit)[\"']?[[:space:]]*[:=]"
 
 FOUND=0
 
-for FILE in $STAGED_FILES; do
-    if [[ -f "$FILE" ]]; then
-        if grep -En "$FORBIDDEN_REGEX" "$FILE" >/dev/null 2>&1; then
-            echo "Помилка pre-commit: у файлі '$FILE' виявлено потенційний секрет або маркер DO_NOT_COMMIT." >&2
-            FOUND=1
-        fi
+while IFS= read -r -d '' FILE; do
+    lines="$(git show ":$FILE" | grep -EniI "$FORBIDDEN_REGEX" | cut -d: -f1 | paste -sd, - || true)"
+    if [[ -n "$lines" ]]; then
+        echo "Помилка pre-commit: у файлі '$FILE' (рядки: $lines) виявлено потенційний секрет або маркер DO_NOT_COMMIT." >&2
+        FOUND=1
     fi
-done
+done < <(git diff --cached --name-only --diff-filter=ACM -z)
 
 if [[ "$FOUND" -ne 0 ]]; then
     echo "Коміт скасовано. Видаліть чутливі дані перед фіксацією змін." >&2
+    echo "(Якщо це хибне спрацювання: git commit --no-verify)" >&2
     exit 1
 fi
 
